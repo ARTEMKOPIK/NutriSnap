@@ -28,6 +28,8 @@ class MainViewModel(
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Idle)
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
+    private var lastInsertedId: Long? = null
+
     private fun getStartOfDay(): Long {
         return Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
@@ -71,17 +73,27 @@ class MainViewModel(
 
     // Changed to suspend to avoid redundant coroutine creation
     private suspend fun saveEntry(analysis: FoodAnalysis) {
-        foodDao.insertEntry(
-            FoodEntry(
-                dishName = analysis.dishName,
-                calories = analysis.calories,
-                proteins = analysis.proteins,
-                fats = analysis.fats,
-                carbs = analysis.carbs,
-                description = analysis.description,
-                aiTip = analysis.aiTip,
-            ),
-        )
+        lastInsertedId =
+            foodDao.insertEntry(
+                FoodEntry(
+                    dishName = analysis.dishName,
+                    calories = analysis.calories,
+                    proteins = analysis.proteins,
+                    fats = analysis.fats,
+                    carbs = analysis.carbs,
+                    description = analysis.description,
+                    aiTip = analysis.aiTip,
+                ),
+            )
+    }
+
+    fun undoLastAction() {
+        viewModelScope.launch {
+            lastInsertedId?.let { id ->
+                foodDao.deleteEntryById(id)
+                lastInsertedId = null
+            }
+        }
     }
 
     fun deleteEntry(entry: FoodEntry) {

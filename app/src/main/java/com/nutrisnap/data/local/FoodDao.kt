@@ -14,7 +14,10 @@ interface FoodDao {
     fun getAllEntries(): Flow<List<FoodEntry>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertEntry(entry: FoodEntry)
+    suspend fun insertEntry(entry: FoodEntry): Long
+
+    @Query("DELETE FROM food_entries WHERE id = :id")
+    suspend fun deleteEntryById(id: Long)
 
     @Update
     suspend fun updateEntry(entry: FoodEntry)

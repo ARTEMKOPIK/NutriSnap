@@ -14,32 +14,36 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.util.Calendar
-import java.util.Date
 
 class MainViewModel(
     private val repository: GroqRepository,
-    private val foodDao: FoodDao
+    private val foodDao: FoodDao,
 ) : ViewModel() {
-
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Idle)
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
 
-    val todayEntries = foodDao.getAllEntries()
-        .map { entries ->
-            val startOfDay = Calendar.getInstance().apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-            }.timeInMillis
-            entries.filter { it.timestamp >= startOfDay }
-        }
-        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+    val todayEntries =
+        foodDao.getAllEntries()
+            .map { entries ->
+                val startOfDay =
+                    Calendar.getInstance().apply {
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                    }.timeInMillis
+                entries.filter { it.timestamp >= startOfDay }
+            }
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val dailyCalories = todayEntries.map { entries ->
-        entries.sumOf { it.calories }
-    }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
+    val dailyCalories =
+        todayEntries.map { entries ->
+            entries.sumOf { it.calories }
+        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), 0)
 
-    fun analyzeFood(text: String? = null, imageBytes: ByteArray? = null) {
+    fun analyzeFood(
+        text: String? = null,
+        imageBytes: ByteArray? = null,
+    ) {
         _uiState.value = MainUiState.Loading
         viewModelScope.launch {
             repository.analyze(text, imageBytes)
@@ -63,8 +67,8 @@ class MainViewModel(
                     fats = analysis.fats,
                     carbs = analysis.carbs,
                     description = analysis.description,
-                    aiTip = analysis.aiTip
-                )
+                    aiTip = analysis.aiTip,
+                ),
             )
         }
     }
@@ -78,7 +82,10 @@ class MainViewModel(
 
 sealed class MainUiState {
     object Idle : MainUiState()
+
     object Loading : MainUiState()
+
     data class Success(val data: FoodAnalysis) : MainUiState()
+
     data class Error(val message: String) : MainUiState()
 }

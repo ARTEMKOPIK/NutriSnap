@@ -33,28 +33,29 @@ import java.util.concurrent.Executor
 @Suppress("FunctionName")
 fun CameraScreen(
     onImageCaptured: (Uri) -> Unit,
-    onError: (ImageCaptureException) -> Unit
+    onError: (ImageCaptureException) -> Unit,
 ) {
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraExecutor = remember { ContextCompat.getMainExecutor(context) }
-    
+
     val previewView = remember { PreviewView(context) }
     val imageCapture = remember { ImageCapture.Builder().build() }
-    
+
     val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
 
     Box(modifier = Modifier.fillMaxSize()) {
         AndroidView(
             factory = { previewView },
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             val cameraProviderFuture = androidx.camera.lifecycle.ProcessCameraProvider.getInstance(context)
             cameraProviderFuture.addListener({
                 val cameraProvider = cameraProviderFuture.get()
-                val preview = Preview.Builder().build().also {
-                    it.setSurfaceProvider(previewView.surfaceProvider)
-                }
+                val preview =
+                    Preview.Builder().build().also {
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
 
                 try {
                     cameraProvider.unbindAll()
@@ -62,7 +63,7 @@ fun CameraScreen(
                         lifecycleOwner,
                         cameraSelector,
                         preview,
-                        imageCapture
+                        imageCapture,
                     )
                 } catch (e: Exception) {
                     // Handle error
@@ -77,13 +78,14 @@ fun CameraScreen(
                     context = context,
                     executor = cameraExecutor,
                     onImageCaptured = onImageCaptured,
-                    onError = onError
+                    onError = onError,
                 )
             },
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 32.dp)
-                .size(72.dp)
+            modifier =
+                Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp)
+                    .size(72.dp),
         ) {
             Icon(Icons.Default.PhotoCamera, contentDescription = "Take Photo", modifier = Modifier.size(36.dp))
         }
@@ -95,12 +97,13 @@ private fun takePhoto(
     context: Context,
     executor: Executor,
     onImageCaptured: (Uri) -> Unit,
-    onError: (ImageCaptureException) -> Unit
+    onError: (ImageCaptureException) -> Unit,
 ) {
-    val photoFile = File(
-        context.externalCacheDir,
-        SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis()) + ".jpg"
-    )
+    val photoFile =
+        File(
+            context.externalCacheDir,
+            SimpleDateFormat("yyyyMMdd_HHmmss", Locale.US).format(System.currentTimeMillis()) + ".jpg",
+        )
 
     val outputOptions = ImageCapture.OutputFileOptions.Builder(photoFile).build()
 
@@ -115,6 +118,6 @@ private fun takePhoto(
             override fun onError(exception: ImageCaptureException) {
                 onError(exception)
             }
-        }
+        },
     )
 }

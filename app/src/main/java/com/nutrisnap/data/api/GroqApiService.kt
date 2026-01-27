@@ -8,6 +8,6 @@ interface GroqApiService {
     @POST("v1/chat/completions")
     suspend fun analyzeFood(
         @Header("Authorization") authHeader: String,
-        @Body request: GroqRequest
+        @Body request: GroqRequest,
     ): GroqResponse
 }

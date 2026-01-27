@@ -20,4 +20,6 @@
     <string name="carbs">Углеводы</string>
     <string name="food_description_hint">Опишите ваш прием пищи...</string>
     <string name="what_did_you_eat">Что вы съели?</string>
+    <string name="analysis_success">Добавлено: %1$s</string>
+    <string name="analysis_error">Ошибка: %1$s</string>
 </resources>

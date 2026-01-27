@@ -12,23 +12,24 @@ import java.util.Date
 import java.util.Locale
 
 class PdfExporter(private val context: Context) {
-
     fun exportToPdf(entries: List<FoodEntry>): File? {
         val pdfDocument = PdfDocument()
-        val titlePaint = Paint().apply {
-            textSize = 24f
-            isFakeBoldText = true
-        }
-        val bodyPaint = Paint().apply {
-            textSize = 16f
-        }
+        val titlePaint =
+            Paint().apply {
+                textSize = 24f
+                isFakeBoldText = true
+            }
+        val bodyPaint =
+            Paint().apply {
+                textSize = 16f
+            }
 
         val pageInfo = PdfDocument.PageInfo.Builder(595, 842, 1).create()
         val page = pdfDocument.startPage(pageInfo)
         val canvas: Canvas = page.canvas
 
         canvas.drawText("Отчет о питании NutriSnap", 50f, 50f, titlePaint)
-        
+
         var yPosition = 100f
         val sdf = SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault())
 
@@ -39,7 +40,12 @@ class PdfExporter(private val context: Context) {
             val dateStr = sdf.format(Date(entry.timestamp))
             canvas.drawText("$dateStr: ${entry.dishName}", 50f, yPosition, bodyPaint)
             yPosition += 25f
-            canvas.drawText("Калории: ${entry.calories} ккал (Б: ${entry.proteins}г, Ж: ${entry.fats}г, У: ${entry.carbs}г)", 70f, yPosition, bodyPaint)
+            canvas.drawText(
+                "Калории: ${entry.calories} ккал (Б: ${entry.proteins}г, Ж: ${entry.fats}г, У: ${entry.carbs}г)",
+                70f,
+                yPosition,
+                bodyPaint,
+            )
             yPosition += 40f
         }
 

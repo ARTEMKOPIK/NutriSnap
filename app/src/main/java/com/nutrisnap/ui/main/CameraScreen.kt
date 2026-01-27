@@ -2,6 +2,7 @@ package com.nutrisnap.ui.main
 
 import android.content.Context
 import android.net.Uri
+import androidx.activity.compose.BackHandler
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
 import androidx.camera.core.ImageCaptureException
@@ -12,13 +13,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.stringResource
@@ -35,8 +39,11 @@ import java.util.concurrent.Executor
 @Suppress("FunctionName")
 fun CameraScreen(
     onImageCaptured: (Uri) -> Unit,
+    onClose: () -> Unit,
     onError: (ImageCaptureException) -> Unit,
 ) {
+    BackHandler { onClose() }
+
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val cameraExecutor = remember { ContextCompat.getMainExecutor(context) }
@@ -71,6 +78,20 @@ fun CameraScreen(
                     // Handle error
                 }
             }, ContextCompat.getMainExecutor(context))
+        }
+
+        IconButton(
+            onClick = onClose,
+            modifier =
+                Modifier
+                    .align(Alignment.TopStart)
+                    .padding(16.dp),
+        ) {
+            Icon(
+                Icons.Default.Close,
+                contentDescription = stringResource(R.string.close),
+                tint = Color.White,
+            )
         }
 
         FloatingActionButton(

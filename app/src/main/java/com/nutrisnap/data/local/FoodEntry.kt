@@ -1,9 +1,13 @@
 package com.nutrisnap.data.local
 
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "food_entries")
+@Entity(
+    tableName = "food_entries",
+    indices = [Index(value = ["timestamp"])],
+)
 data class FoodEntry(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
     val dishName: String,

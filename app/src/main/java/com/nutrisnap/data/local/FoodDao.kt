@@ -24,4 +24,20 @@ interface FoodDao {
 
     @Query("SELECT SUM(calories) FROM food_entries WHERE timestamp >= :startOfDay")
     fun getTodayCalories(startOfDay: Long): Flow<Int?>
+
+    @Query(
+        """
+        SELECT
+            COALESCE(SUM(calories), 0) as calories,
+            COALESCE(SUM(proteins), 0.0) as proteins,
+            COALESCE(SUM(fats), 0.0) as fats,
+            COALESCE(SUM(carbs), 0.0) as carbs
+        FROM food_entries
+        WHERE timestamp >= :startOfDay
+    """,
+    )
+    fun getDailyStats(startOfDay: Long): Flow<DailyStats>
+
+    @Query("SELECT * FROM food_entries WHERE timestamp >= :startOfDay ORDER BY timestamp DESC")
+    fun getEntriesAfter(startOfDay: Long): Flow<List<FoodEntry>>
 }

@@ -1,6 +1,9 @@
 package com.nutrisnap.ui.main
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -39,6 +42,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -52,6 +56,7 @@ import androidx.compose.ui.unit.sp
 import com.nutrisnap.R
 import com.nutrisnap.ui.viewmodel.MainUiState
 import com.nutrisnap.ui.viewmodel.MainViewModel
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -61,6 +66,7 @@ fun MainScreen(viewModel: MainViewModel) {
     var inputText by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsState()
     val isLoading = uiState is MainUiState.Loading
@@ -123,8 +129,14 @@ fun MainScreen(viewModel: MainViewModel) {
             // Daily Summary Card (extracted to localize recomposition)
             DailySummaryCard(viewModel)
 
-            if (uiState is MainUiState.Loading) {
-                CircularProgressIndicator(modifier = Modifier.padding(16.dp))
+            // Fixed-height container to prevent layout jank when loading
+            Box(
+                modifier = Modifier.height(72.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                if (uiState is MainUiState.Loading) {
+                    CircularProgressIndicator()
+                }
             }
 
             Spacer(modifier = Modifier.weight(1f))
@@ -138,17 +150,30 @@ fun MainScreen(viewModel: MainViewModel) {
 
             Spacer(modifier = Modifier.height(24.dp))
 
+            val comingSoonMessage = stringResource(R.string.coming_soon)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                ActionButton(Icons.Default.PhotoCamera, stringResource(R.string.camera), enabled = !isLoading) { showCamera = true }
+                ActionButton(
+                    Icons.Default.PhotoCamera,
+                    stringResource(R.string.camera),
+                    enabled = !isLoading,
+                ) { showCamera = true }
                 ActionButton(
                     Icons.Default.PhotoLibrary,
                     stringResource(R.string.gallery),
                     enabled = !isLoading,
-                ) { /* Implement gallery picker */ }
-                ActionButton(Icons.Default.Mic, stringResource(R.string.voice), enabled = !isLoading) { /* Implement STT */ }
+                ) {
+                    scope.launch { snackbarHostState.showSnackbar(comingSoonMessage) }
+                }
+                ActionButton(
+                    Icons.Default.Mic,
+                    stringResource(R.string.voice),
+                    enabled = !isLoading,
+                ) {
+                    scope.launch { snackbarHostState.showSnackbar(comingSoonMessage) }
+                }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -203,6 +228,11 @@ fun MainScreen(viewModel: MainViewModel) {
 fun DailySummaryCard(viewModel: MainViewModel) {
     val dailyStats by viewModel.dailyStats.collectAsState()
 
+    val animatedCalories by animateIntAsState(targetValue = dailyStats.calories, label = "calories")
+    val animatedProteins by animateFloatAsState(targetValue = dailyStats.proteins.toFloat(), label = "proteins")
+    val animatedFats by animateFloatAsState(targetValue = dailyStats.fats.toFloat(), label = "fats")
+    val animatedCarbs by animateFloatAsState(targetValue = dailyStats.carbs.toFloat(), label = "carbs")
+
     Card(
         modifier =
             Modifier
@@ -220,7 +250,7 @@ fun DailySummaryCard(viewModel: MainViewModel) {
         ) {
             Text(stringResource(R.string.today), style = MaterialTheme.typography.titleMedium)
             Text(
-                "${dailyStats.calories}",
+                "$animatedCalories",
                 style = MaterialTheme.typography.headlineLarge,
                 fontWeight = FontWeight.Bold,
             )
@@ -232,9 +262,9 @@ fun DailySummaryCard(viewModel: MainViewModel) {
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                MacroInfo(stringResource(R.string.proteins), "${dailyStats.proteins.toInt()}г")
-                MacroInfo(stringResource(R.string.fats), "${dailyStats.fats.toInt()}г")
-                MacroInfo(stringResource(R.string.carbs), "${dailyStats.carbs.toInt()}г")
+                MacroInfo(stringResource(R.string.proteins), "${animatedProteins.toInt()}г")
+                MacroInfo(stringResource(R.string.fats), "${animatedFats.toInt()}г")
+                MacroInfo(stringResource(R.string.carbs), "${animatedCarbs.toInt()}г")
             }
         }
     }

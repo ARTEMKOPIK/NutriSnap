@@ -13,3 +13,7 @@
 ## 2025-05-14 - [Input Efficiency & Clarity]
 **Learning:** Mobile users expect efficient input workflows. Missing keyboard "Send" actions or a way to quickly clear long text entries creates friction in food-logging apps where speed is key.
 **Action:** Always implement `KeyboardOptions(imeAction = ImeAction.Send)` with corresponding `KeyboardActions` and a conditional "Clear" button for text inputs to improve efficiency and reduce frustration.
+
+## 2025-05-14 - [Layout Stability & Counting Delight]
+**Learning:** Layout jank caused by appearing/disappearing loaders creates a "cheap" feeling. Instant number updates for stats also feel jarring and "mechanical".
+**Action:** Always wrap loaders in fixed-height containers to preserve vertical space and use animate*AsState for numerical updates to provide a smooth, premium "counting" effect.

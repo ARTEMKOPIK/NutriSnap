@@ -13,6 +13,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
@@ -36,25 +37,20 @@ class MainViewModel(
         }.timeInMillis
     }
 
-    // Refresh startOfDay every hour to handle midnight transition
+    // Refresh startOfDay every hour to handle midnight transition.
+    // distinctUntilChanged() prevents redundant database re-queries when the day hasn't changed.
     private val startOfDayFlow =
         flow {
             while (true) {
                 emit(getStartOfDay())
                 delay(3600_000)
             }
-        }
+        }.distinctUntilChanged()
 
     val dailyStats =
         startOfDayFlow.flatMapLatest { start ->
             foodDao.getDailyStats(start)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DailyStats())
-
-    // todayEntries kept for potential future use or other UI components not seen
-    val todayEntries =
-        startOfDayFlow.flatMapLatest { start ->
-            foodDao.getEntriesAfter(start)
-        }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
     fun analyzeFood(
         text: String? = null,
@@ -73,20 +69,19 @@ class MainViewModel(
         }
     }
 
-    private fun saveEntry(analysis: FoodAnalysis) {
-        viewModelScope.launch {
-            foodDao.insertEntry(
-                FoodEntry(
-                    dishName = analysis.dishName,
-                    calories = analysis.calories,
-                    proteins = analysis.proteins,
-                    fats = analysis.fats,
-                    carbs = analysis.carbs,
-                    description = analysis.description,
-                    aiTip = analysis.aiTip,
-                ),
-            )
-        }
+    // Changed to suspend to avoid redundant coroutine creation
+    private suspend fun saveEntry(analysis: FoodAnalysis) {
+        foodDao.insertEntry(
+            FoodEntry(
+                dishName = analysis.dishName,
+                calories = analysis.calories,
+                proteins = analysis.proteins,
+                fats = analysis.fats,
+                carbs = analysis.carbs,
+                description = analysis.description,
+                aiTip = analysis.aiTip,
+            ),
+        )
     }
 
     fun deleteEntry(entry: FoodEntry) {

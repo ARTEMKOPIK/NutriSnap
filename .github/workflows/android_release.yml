@@ -13,6 +13,8 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 # Necessary for generating changelogs
 
     - name: Set up JDK 17
       uses: actions/setup-java@v4
@@ -25,18 +27,36 @@ jobs:
       with:
         gradle-version: 8.5
 
+    - name: Run Lint
+      run: gradle lintDebug
+
     - name: Build with Gradle
       run: gradle assembleDebug
       env:
         GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
+        GITHUB_RUN_NUMBER: ${{ github.run_number }}
+
+    - name: Generate Changelog
+      id: changelog
+      run: |
+        echo "CHANGELOG<<EOF" >> $GITHUB_ENV
+        git log -n 5 --pretty=format:"- %s" >> $GITHUB_ENV
+        echo "" >> $GITHUB_ENV
+        echo "EOF" >> $GITHUB_ENV
 
     - name: Create GitHub Release
       if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')
       id: create_release
       uses: softprops/action-gh-release@v2
       with:
-        tag_name: v${{ github.run_number }}
-        name: Release v${{ github.run_number }}
+        tag_name: v1.0.${{ github.run_number }}
+        name: Release v1.0.${{ github.run_number }}
+        body: |
+          ### Что нового в этой версии:
+          ${{ env.CHANGELOG }}
+          
+          ---
+          *Автоматическая сборка NutriSnap CI/CD*
         draft: false
         prerelease: false
         files: app/build/outputs/apk/debug/app-debug.apk

@@ -24,6 +24,7 @@
     <string name="analysis_error">Ошибка: %1$s</string>
     <string name="take_photo">Сделать фото</string>
     <string name="clear">Очистить</string>
+    <string name="undo">Отмена</string>
     <string name="close">Закрыть</string>
     <string name="coming_soon">Функция скоро появится</string>
 </resources>

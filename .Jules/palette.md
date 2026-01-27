@@ -21,3 +21,7 @@
 ## 2025-05-14 - [Camera Screen Escape Hatch]
 **Learning:** Full-screen camera overlays can trap users if they don't provide a visible exit button or don't handle the system back gesture. This is especially frustrating if the user opened the camera by mistake.
 **Action:** Always include a `BackHandler` and a visible `IconButton` (e.g., Close/X) in full-screen camera components to ensure an easy "escape hatch".
+
+## 2025-05-15 - [Forgiving UI with Undo]
+**Learning:** Instant data saving (like AI food logging) feels efficient but can be anxiety-inducing if there's no way to quickly fix mistakes. A "soft-delete" via an "Undo" snackbar action provides a safety net that encourages experimentation.
+**Action:** For automated or quick-entry features, capture the generated database ID and offer an "Undo" action in the success snackbar to allow immediate reversal of the action.

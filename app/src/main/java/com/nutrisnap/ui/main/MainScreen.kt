@@ -34,6 +34,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
@@ -47,7 +48,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
@@ -66,6 +69,7 @@ fun MainScreen(viewModel: MainViewModel) {
     var inputText by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
+    val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
 
     val uiState by viewModel.uiState.collectAsState()
@@ -75,9 +79,15 @@ fun MainScreen(viewModel: MainViewModel) {
         val currentState = uiState
         when (currentState) {
             is MainUiState.Success -> {
-                snackbarHostState.showSnackbar(
-                    message = context.getString(R.string.analysis_success, currentState.data.dishName),
-                )
+                val result =
+                    snackbarHostState.showSnackbar(
+                        message = context.getString(R.string.analysis_success, currentState.data.dishName),
+                        actionLabel = context.getString(R.string.undo),
+                    )
+                if (result == SnackbarResult.ActionPerformed) {
+                    haptic.performHapticFeedback(HapticFeedbackType.LongPress)
+                    viewModel.undoLastAction()
+                }
             }
             is MainUiState.Error -> {
                 snackbarHostState.showSnackbar(

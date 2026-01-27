@@ -9,3 +9,7 @@
 ## 2025-05-14 - [Balanced UI Centering]
 **Learning:** In horizontally structured navigation bars (like onboarding footers), dynamic button presence (e.g., "Skip" appearing only on early pages) or varying button widths can cause the center element (like page indicators) to shift visually, creating a jarring "jank" feeling.
 **Action:** Use equal-weight containers (`Box(Modifier.weight(1f))`) for the left and right slots to ensure the center element remains perfectly anchored at the screen's center regardless of the content in the side slots.
+
+## 2025-05-14 - [Input Efficiency & Clarity]
+**Learning:** Mobile users expect efficient input workflows. Missing keyboard "Send" actions or a way to quickly clear long text entries creates friction in food-logging apps where speed is key.
+**Action:** Always implement `KeyboardOptions(imeAction = ImeAction.Send)` with corresponding `KeyboardActions` and a conditional "Clear" button for text inputs to improve efficiency and reduce frustration.

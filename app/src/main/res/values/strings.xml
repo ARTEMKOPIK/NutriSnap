@@ -22,4 +22,6 @@
     <string name="what_did_you_eat">Что вы съели?</string>
     <string name="analysis_success">Добавлено: %1$s</string>
     <string name="analysis_error">Ошибка: %1$s</string>
+    <string name="take_photo">Сделать фото</string>
+    <string name="clear">Очистить</string>
 </resources>

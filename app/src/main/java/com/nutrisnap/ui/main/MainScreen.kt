@@ -58,9 +58,8 @@ fun MainScreen(viewModel: MainViewModel) {
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
 
-    val dailyCalories by viewModel.dailyCalories.collectAsState()
+    val dailyStats by viewModel.dailyStats.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
-    val todayEntries by viewModel.todayEntries.collectAsState()
     val isLoading = uiState is MainUiState.Loading
 
     LaunchedEffect(uiState) {
@@ -135,7 +134,7 @@ fun MainScreen(viewModel: MainViewModel) {
                     horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
                     Text(stringResource(R.string.today), style = MaterialTheme.typography.titleMedium)
-                    Text("$dailyCalories", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
+                    Text("${dailyStats.calories}", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
                     Text(stringResource(R.string.calories), style = MaterialTheme.typography.labelLarge)
 
                     Spacer(modifier = Modifier.height(16.dp))
@@ -144,9 +143,9 @@ fun MainScreen(viewModel: MainViewModel) {
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
-                        MacroInfo(stringResource(R.string.proteins), "${todayEntries.sumOf { it.proteins.toInt() }}г")
-                        MacroInfo(stringResource(R.string.fats), "${todayEntries.sumOf { it.fats.toInt() }}г")
-                        MacroInfo(stringResource(R.string.carbs), "${todayEntries.sumOf { it.carbs.toInt() }}г")
+                        MacroInfo(stringResource(R.string.proteins), "${dailyStats.proteins.toInt()}г")
+                        MacroInfo(stringResource(R.string.fats), "${dailyStats.fats.toInt()}г")
+                        MacroInfo(stringResource(R.string.carbs), "${dailyStats.carbs.toInt()}г")
                     }
                 }
             }

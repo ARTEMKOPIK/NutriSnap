@@ -21,7 +21,8 @@ class NutriSnapApp : Application() {
                 this,
                 AppDatabase::class.java,
                 "nutrisnap_db",
-            ).build()
+            ).addMigrations(AppDatabase.MIGRATION_1_2)
+                .build()
 
         // Initialize API and Repository
         val retrofit =

@@ -24,6 +24,7 @@ class MainActivity : ComponentActivity() {
         
         val app = application as NutriSnapApp
         val viewModelFactory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
                 return MainViewModel(app.repository, app.database.foodDao()) as T
             }

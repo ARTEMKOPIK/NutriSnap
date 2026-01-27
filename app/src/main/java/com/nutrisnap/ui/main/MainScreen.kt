@@ -33,7 +33,7 @@ fun MainScreen(viewModel: MainViewModel) {
 
     if (showCamera) {
         CameraScreen(
-            onImageCaptured = { uri ->
+            onImageCaptured = { _ ->
                 showCamera = false
                 // Handle image analysis
             },

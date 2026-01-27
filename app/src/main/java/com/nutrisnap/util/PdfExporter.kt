@@ -14,7 +14,6 @@ class PdfExporter(private val context: Context) {
 
     fun exportToPdf(entries: List<FoodEntry>): File? {
         val pdfDocument = PdfDocument()
-        val paint = Paint()
         val titlePaint = Paint().apply {
             textSize = 24f
             isFakeBoldText = true

@@ -17,3 +17,7 @@
 ## 2025-05-14 - [Layout Stability & Counting Delight]
 **Learning:** Layout jank caused by appearing/disappearing loaders creates a "cheap" feeling. Instant number updates for stats also feel jarring and "mechanical".
 **Action:** Always wrap loaders in fixed-height containers to preserve vertical space and use animate*AsState for numerical updates to provide a smooth, premium "counting" effect.
+
+## 2025-05-14 - [Camera Screen Escape Hatch]
+**Learning:** Full-screen camera overlays can trap users if they don't provide a visible exit button or don't handle the system back gesture. This is especially frustrating if the user opened the camera by mistake.
+**Action:** Always include a `BackHandler` and a visible `IconButton` (e.g., Close/X) in full-screen camera components to ensure an easy "escape hatch".

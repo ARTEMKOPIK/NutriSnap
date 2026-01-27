@@ -94,6 +94,7 @@ fun MainScreen(viewModel: MainViewModel) {
                 showCamera = false
                 // Handle image analysis
             },
+            onClose = { showCamera = false },
             onError = { showCamera = false },
         )
         return

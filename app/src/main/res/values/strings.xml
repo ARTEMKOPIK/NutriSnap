@@ -1,0 +1,23 @@
+<resources>
+    <string name="app_name">NutriSnap</string>
+    <string name="onboarding_1_title">Добро пожаловать в NutriSnap</string>
+    <string name="onboarding_1_desc">Ваш персональный ИИ-помощник для анализа питания</string>
+    <string name="onboarding_2_title">Просто сфотографируйте</string>
+    <string name="onboarding_2_desc">ИИ мгновенно определит блюдо и рассчитает калории</string>
+    <string name="onboarding_3_title">Следите за прогрессом</string>
+    <string name="onboarding_3_desc">Сохраняйте историю и достигайте своих целей</string>
+    <string name="get_started">Начать</string>
+    <string name="next">Далее</string>
+    <string name="skip">Пропустить</string>
+    <string name="camera">Камера</string>
+    <string name="gallery">Галерея</string>
+    <string name="voice">Голос</string>
+    <string name="send">Отправить</string>
+    <string name="today">Сегодня</string>
+    <string name="calories">калорий</string>
+    <string name="proteins">Белки</string>
+    <string name="fats">Жиры</string>
+    <string name="carbs">Углеводы</string>
+    <string name="food_description_hint">Опишите ваш прием пищи...</string>
+    <string name="what_did_you_eat">Что вы съели?</string>
+</resources>

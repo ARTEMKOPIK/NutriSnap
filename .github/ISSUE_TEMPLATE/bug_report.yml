@@ -1,0 +1,34 @@
+name: Отчет об ошибке
+description: Создайте отчет, чтобы помочь нам улучшить NutriSnap
+title: "[BUG]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Спасибо, что нашли время сообщить об ошибке!
+  - type: textarea
+    id: description
+    attributes:
+      label: Описание ошибки
+      description: Четкое и краткое описание того, что происходит.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Как воспроизвести
+      description: Шаги для воспроизведения ошибки.
+      placeholder: |
+        1. Открыть приложение
+        2. Нажать на камеру
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Ожидаемое поведение
+      description: Что должно было произойти на самом деле.
+    validations:
+      required: true

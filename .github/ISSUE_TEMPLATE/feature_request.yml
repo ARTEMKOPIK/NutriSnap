@@ -1,0 +1,19 @@
+name: Предложение функции
+description: Предложите идею для NutriSnap
+title: "[FEATURE]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: С какой проблемой вы столкнулись?
+      description: Опишите, что вы пытаетесь сделать и почему текущий функционал не подходит.
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Ваше предложение
+      description: Опишите решение, которое вы хотите видеть.
+    validations:
+      required: true

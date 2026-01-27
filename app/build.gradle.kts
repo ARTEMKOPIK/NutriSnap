@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("com.google.devtools.ksp")
+    id("com.diffplug.spotless")
 }
 
 android {
@@ -49,6 +50,20 @@ android {
         resources {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
+    }
+}
+
+spotless {
+    kotlin {
+        target("**/*.kt")
+        ktlint("1.1.1")
+        trimTrailingWhitespace()
+        indentWithSpaces()
+        endWithNewline()
+    }
+    kotlinGradle {
+        target("*.gradle.kts")
+        ktlint("1.1.1")
     }
 }
 

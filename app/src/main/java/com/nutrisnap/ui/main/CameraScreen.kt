@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Camera
+import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
@@ -84,7 +84,7 @@ fun CameraScreen(
                 .padding(bottom = 32.dp)
                 .size(72.dp)
         ) {
-            Icon(Icons.Default.Camera, contentDescription = "Take Photo", modifier = Modifier.size(36.dp))
+            Icon(Icons.Default.PhotoCamera, contentDescription = "Take Photo", modifier = Modifier.size(36.dp))
         }
     }
 }

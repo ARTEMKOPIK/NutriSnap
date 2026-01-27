@@ -40,6 +40,7 @@ data class OnboardingPage(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
+@Suppress("FunctionName")
 fun OnboardingScreen(onFinish: () -> Unit) {
     val pages = listOf(
         OnboardingPage(R.string.onboarding_1_title, R.string.onboarding_1_desc, MaterialTheme.colorScheme.primary),
@@ -104,6 +105,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
 }
 
 @Composable
+@Suppress("FunctionName")
 fun OnboardingPageContent(page: OnboardingPage) {
     Column(
         modifier = Modifier

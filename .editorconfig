@@ -1,2 +1,4 @@
+root = true
+
 [*.{kt,kts}]
 kotlin_function_naming_allow_pascal_case = true

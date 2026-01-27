@@ -48,6 +48,7 @@ import com.nutrisnap.ui.viewmodel.MainUiState
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
+@Suppress("FunctionName")
 fun MainScreen(viewModel: MainViewModel) {
     var showCamera by remember { mutableStateOf(false) }
     var inputText by remember { mutableStateOf("") }
@@ -172,6 +173,7 @@ fun MainScreen(viewModel: MainViewModel) {
 }
 
 @Composable
+@Suppress("FunctionName")
 fun MacroInfo(label: String, value: String) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontWeight = FontWeight.Bold)
@@ -180,6 +182,7 @@ fun MacroInfo(label: String, value: String) {
 }
 
 @Composable
+@Suppress("FunctionName")
 fun ActionButton(icon: ImageVector, label: String, onClick: () -> Unit) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FilledTonalIconButton(

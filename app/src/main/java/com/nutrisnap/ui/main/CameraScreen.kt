@@ -30,6 +30,7 @@ import java.util.Locale
 import java.util.concurrent.Executor
 
 @Composable
+@Suppress("FunctionName")
 fun CameraScreen(
     onImageCaptured: (Uri) -> Unit,
     onError: (ImageCaptureException) -> Unit

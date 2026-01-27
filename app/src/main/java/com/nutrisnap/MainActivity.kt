@@ -13,22 +13,23 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.nutrisnap.ui.onboarding.OnboardingScreen
 import com.nutrisnap.ui.main.MainScreen
+import com.nutrisnap.ui.onboarding.OnboardingScreen
 import com.nutrisnap.ui.theme.NutriSnapTheme
 import com.nutrisnap.ui.viewmodel.MainViewModel
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        
+
         val app = application as NutriSnapApp
-        val viewModelFactory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return MainViewModel(app.repository, app.database.foodDao()) as T
+        val viewModelFactory =
+            object : ViewModelProvider.Factory {
+                @Suppress("UNCHECKED_CAST")
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return MainViewModel(app.repository, app.database.foodDao()) as T
+                }
             }
-        }
 
         setContent {
             NutriSnapTheme {
@@ -37,7 +38,7 @@ class MainActivity : ComponentActivity() {
 
                 Surface(
                     modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    color = MaterialTheme.colorScheme.background,
                 ) {
                     NavHost(navController = navController, startDestination = "onboarding") {
                         composable("onboarding") {

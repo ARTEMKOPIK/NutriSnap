@@ -6,38 +6,38 @@ data class GroqRequest(
     val model: String,
     val messages: List<Message>,
     val temperature: Double = 0.1,
-    @SerializedName("response_format") val responseFormat: ResponseFormat? = null
+    @SerializedName("response_format") val responseFormat: ResponseFormat? = null,
 )
 
 data class ResponseFormat(
-    val type: String = "json_object"
+    val type: String = "json_object",
 )
 
 data class Message(
     val role: String,
-    val content: List<Content>
+    val content: List<Content>,
 )
 
 data class Content(
     val type: String,
     val text: String? = null,
-    @SerializedName("image_url") val imageUrl: ImageUrl? = null
+    @SerializedName("image_url") val imageUrl: ImageUrl? = null,
 )
 
 data class ImageUrl(
-    val url: String
+    val url: String,
 )
 
 data class GroqResponse(
-    val choices: List<Choice>
+    val choices: List<Choice>,
 )
 
 data class Choice(
-    val message: ResponseMessage
+    val message: ResponseMessage,
 )
 
 data class ResponseMessage(
-    val content: String
+    val content: String,
 )
 
 // Model for the parsed food data
@@ -48,5 +48,5 @@ data class FoodAnalysis(
     val fats: Float,
     val carbs: Float,
     val description: String,
-    val aiTip: String
+    val aiTip: String,
 )

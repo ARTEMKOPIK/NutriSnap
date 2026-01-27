@@ -1,6 +1,5 @@
 package com.nutrisnap.ui.main
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -27,9 +26,12 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,13 +40,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nutrisnap.R
-import com.nutrisnap.ui.viewmodel.MainViewModel
 import com.nutrisnap.ui.viewmodel.MainUiState
+import com.nutrisnap.ui.viewmodel.MainViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,10 +55,30 @@ import com.nutrisnap.ui.viewmodel.MainUiState
 fun MainScreen(viewModel: MainViewModel) {
     var showCamera by remember { mutableStateOf(false) }
     var inputText by remember { mutableStateOf("") }
-    
+    val snackbarHostState = remember { SnackbarHostState() }
+    val context = LocalContext.current
+
     val dailyCalories by viewModel.dailyCalories.collectAsState()
     val uiState by viewModel.uiState.collectAsState()
     val todayEntries by viewModel.todayEntries.collectAsState()
+    val isLoading = uiState is MainUiState.Loading
+
+    LaunchedEffect(uiState) {
+        val currentState = uiState
+        when (currentState) {
+            is MainUiState.Success -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.analysis_success, currentState.data.dishName),
+                )
+            }
+            is MainUiState.Error -> {
+                snackbarHostState.showSnackbar(
+                    message = context.getString(R.string.analysis_error, currentState.message),
+                )
+            }
+            else -> {}
+        }
+    }
 
     if (showCamera) {
         CameraScreen(
@@ -63,62 +86,67 @@ fun MainScreen(viewModel: MainViewModel) {
                 showCamera = false
                 // Handle image analysis
             },
-            onError = { showCamera = false }
+            onError = { showCamera = false },
         )
         return
     }
 
     Scaffold(
+        snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
             CenterAlignedTopAppBar(
-                title = { 
+                title = {
                     Text(
-                        "NutriSnap", 
+                        stringResource(R.string.app_name),
                         fontWeight = FontWeight.ExtraBold,
-                        letterSpacing = 2.sp
-                    ) 
+                        letterSpacing = 2.sp,
+                    )
                 },
-                colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    titleContentColor = MaterialTheme.colorScheme.onPrimary
-                )
+                colors =
+                    TopAppBarDefaults.centerAlignedTopAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        titleContentColor = MaterialTheme.colorScheme.onPrimary,
+                    ),
             )
-        }
+        },
     ) { paddingValues ->
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Daily Summary Card
             Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 16.dp),
                 shape = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer
-                )
+                colors =
+                    CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
             ) {
                 Column(
                     modifier = Modifier.padding(24.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                    horizontalAlignment = Alignment.CenterHorizontally,
                 ) {
-                    Text("Сегодня", style = MaterialTheme.typography.titleMedium)
+                    Text(stringResource(R.string.today), style = MaterialTheme.typography.titleMedium)
                     Text("$dailyCalories", style = MaterialTheme.typography.headlineLarge, fontWeight = FontWeight.Bold)
-                    Text("калорий", style = MaterialTheme.typography.labelLarge)
-                    
+                    Text(stringResource(R.string.calories), style = MaterialTheme.typography.labelLarge)
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                     ) {
-                        MacroInfo("Белки", "${todayEntries.sumOf { it.proteins.toInt() }}г")
-                        MacroInfo("Жиры", "${todayEntries.sumOf { it.fats.toInt() }}г")
-                        MacroInfo("Углеводы", "${todayEntries.sumOf { it.carbs.toInt() }}г")
+                        MacroInfo(stringResource(R.string.proteins), "${todayEntries.sumOf { it.proteins.toInt() }}г")
+                        MacroInfo(stringResource(R.string.fats), "${todayEntries.sumOf { it.fats.toInt() }}г")
+                        MacroInfo(stringResource(R.string.carbs), "${todayEntries.sumOf { it.carbs.toInt() }}г")
                     }
                 }
             }
@@ -131,20 +159,24 @@ fun MainScreen(viewModel: MainViewModel) {
 
             // Action Buttons
             Text(
-                "Что вы съели?", 
+                stringResource(R.string.what_did_you_eat),
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
-            
+
             Spacer(modifier = Modifier.height(24.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                ActionButton(Icons.Default.PhotoCamera, "Камера") { showCamera = true }
-                ActionButton(Icons.Default.PhotoLibrary, "Галерея") { /* Implement gallery picker */ }
-                ActionButton(Icons.Default.Mic, "Голос") { /* Implement STT */ }
+                ActionButton(Icons.Default.PhotoCamera, stringResource(R.string.camera), enabled = !isLoading) { showCamera = true }
+                ActionButton(
+                    Icons.Default.PhotoLibrary,
+                    stringResource(R.string.gallery),
+                    enabled = !isLoading,
+                ) { /* Implement gallery picker */ }
+                ActionButton(Icons.Default.Mic, stringResource(R.string.voice), enabled = !isLoading) { /* Implement STT */ }
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -153,20 +185,22 @@ fun MainScreen(viewModel: MainViewModel) {
                 value = inputText,
                 onValueChange = { inputText = it },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = { Text("Опишите ваш прием пищи...") },
+                enabled = !isLoading,
+                placeholder = { Text(stringResource(R.string.food_description_hint)) },
                 shape = RoundedCornerShape(16.dp),
                 trailingIcon = {
-                    IconButton(onClick = { 
-                        if (inputText.isNotBlank()) {
+                    IconButton(
+                        enabled = !isLoading && inputText.isNotBlank(),
+                        onClick = {
                             viewModel.analyzeFood(text = inputText)
                             inputText = ""
-                        }
-                    }) {
-                        Icon(Icons.Default.Send, contentDescription = "Send")
+                        },
+                    ) {
+                        Icon(Icons.Default.Send, contentDescription = stringResource(R.string.send))
                     }
-                }
+                },
             )
-            
+
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -174,7 +208,10 @@ fun MainScreen(viewModel: MainViewModel) {
 
 @Composable
 @Suppress("FunctionName")
-fun MacroInfo(label: String, value: String) {
+fun MacroInfo(
+    label: String,
+    value: String,
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         Text(value, fontWeight = FontWeight.Bold)
         Text(label, style = MaterialTheme.typography.labelSmall)
@@ -183,12 +220,18 @@ fun MacroInfo(label: String, value: String) {
 
 @Composable
 @Suppress("FunctionName")
-fun ActionButton(icon: ImageVector, label: String, onClick: () -> Unit) {
+fun ActionButton(
+    icon: ImageVector,
+    label: String,
+    enabled: Boolean = true,
+    onClick: () -> Unit,
+) {
     Column(horizontalAlignment = Alignment.CenterHorizontally) {
         FilledTonalIconButton(
             onClick = onClick,
+            enabled = enabled,
             modifier = Modifier.size(64.dp),
-            shape = RoundedCornerShape(16.dp)
+            shape = RoundedCornerShape(16.dp),
         ) {
             Icon(icon, contentDescription = label, modifier = Modifier.size(32.dp))
         }

@@ -14,5 +14,5 @@ data class FoodEntry(
     val description: String,
     val aiTip: String,
     val timestamp: Long = System.currentTimeMillis(),
-    val imagePath: String? = null
+    val imagePath: String? = null,
 )

@@ -35,49 +35,54 @@ import kotlinx.coroutines.launch
 data class OnboardingPage(
     val titleRes: Int,
     val descriptionRes: Int,
-    val color: Color
+    val color: Color,
 )
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 @Suppress("FunctionName")
 fun OnboardingScreen(onFinish: () -> Unit) {
-    val pages = listOf(
-        OnboardingPage(R.string.onboarding_1_title, R.string.onboarding_1_desc, MaterialTheme.colorScheme.primary),
-        OnboardingPage(R.string.onboarding_2_title, R.string.onboarding_2_desc, MaterialTheme.colorScheme.secondary),
-        OnboardingPage(R.string.onboarding_3_title, R.string.onboarding_3_desc, MaterialTheme.colorScheme.tertiary)
-    )
+    val pages =
+        listOf(
+            OnboardingPage(R.string.onboarding_1_title, R.string.onboarding_1_desc, MaterialTheme.colorScheme.primary),
+            OnboardingPage(R.string.onboarding_2_title, R.string.onboarding_2_desc, MaterialTheme.colorScheme.secondary),
+            OnboardingPage(R.string.onboarding_3_title, R.string.onboarding_3_desc, MaterialTheme.colorScheme.tertiary),
+        )
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
 
     Column(modifier = Modifier.fillMaxSize()) {
         HorizontalPager(
             state = pagerState,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         ) { pageIndex ->
             OnboardingPageContent(pages[pageIndex])
         }
 
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(24.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Page Indicator
             Row {
                 repeat(pages.size) { index ->
-                    val color = if (pagerState.currentPage == index) 
-                        MaterialTheme.colorScheme.primary 
-                    else 
-                        MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                    val color =
+                        if (pagerState.currentPage == index) {
+                            MaterialTheme.colorScheme.primary
+                        } else {
+                            MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                        }
                     Box(
-                        modifier = Modifier
-                            .padding(4.dp)
-                            .size(10.dp)
-                            .clip(CircleShape)
-                            .background(color)
+                        modifier =
+                            Modifier
+                                .padding(4.dp)
+                                .size(10.dp)
+                                .clip(CircleShape)
+                                .background(color),
                     )
                 }
             }
@@ -91,13 +96,15 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                         onFinish()
                     }
                 },
-                shape = CircleShape
+                shape = CircleShape,
             ) {
                 Text(
-                    text = if (pagerState.currentPage == pages.size - 1) 
-                        stringResource(R.string.get_started) 
-                    else 
-                        stringResource(R.string.next)
+                    text =
+                        if (pagerState.currentPage == pages.size - 1) {
+                            stringResource(R.string.get_started)
+                        } else {
+                            stringResource(R.string.next)
+                        },
                 )
             }
         }
@@ -108,42 +115,44 @@ fun OnboardingScreen(onFinish: () -> Unit) {
 @Suppress("FunctionName")
 fun OnboardingPageContent(page: OnboardingPage) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(32.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         // Placeholder for illustration
         Box(
-            modifier = Modifier
-                .size(250.dp)
-                .clip(CircleShape)
-                .background(page.color.copy(alpha = 0.2f)),
-            contentAlignment = Alignment.Center
+            modifier =
+                Modifier
+                    .size(250.dp)
+                    .clip(CircleShape)
+                    .background(page.color.copy(alpha = 0.2f)),
+            contentAlignment = Alignment.Center,
         ) {
             // Icon or image could go here
             Text("IMAGE", color = page.color, fontWeight = FontWeight.Bold)
         }
-        
+
         Spacer(modifier = Modifier.height(48.dp))
-        
+
         Text(
             text = stringResource(page.titleRes),
             style = MaterialTheme.typography.headlineMedium,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground
+            color = MaterialTheme.colorScheme.onBackground,
         )
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         Text(
             text = stringResource(page.descriptionRes),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
             color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-            lineHeight = 24.sp
+            lineHeight = 24.sp,
         )
     }
 }

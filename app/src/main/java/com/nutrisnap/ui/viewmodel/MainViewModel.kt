@@ -6,9 +6,15 @@ import com.nutrisnap.data.api.FoodAnalysis
 import com.nutrisnap.data.local.FoodDao
 import com.nutrisnap.data.local.FoodEntry
 import com.nutrisnap.data.repository.GroqRepository
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 
 class MainViewModel(
     private val repository: GroqRepository,

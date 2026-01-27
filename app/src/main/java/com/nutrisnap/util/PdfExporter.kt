@@ -8,7 +8,8 @@ import com.nutrisnap.data.local.FoodEntry
 import java.io.File
 import java.io.FileOutputStream
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 class PdfExporter(private val context: Context) {
 

@@ -26,6 +26,8 @@ jobs:
 
     - name: Build with Gradle
       run: ./gradlew assembleDebug
+      env:
+        GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
 
     - name: Create GitHub Release
       if: github.event_name == 'push' && (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master')

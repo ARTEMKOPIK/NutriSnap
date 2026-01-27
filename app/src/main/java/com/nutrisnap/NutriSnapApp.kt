@@ -30,7 +30,7 @@ class NutriSnapApp : Application() {
             .build()
 
         val apiService = retrofit.create(GroqApiService::class.java)
-        val apiKey = "ВАШ_API_КЛЮЧ"
+        val apiKey = BuildConfig.GROQ_API_KEY
         
         repository = GroqRepository(apiService, apiKey)
     }

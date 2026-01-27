@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    
+    <!-- Camera Lens Circle (Focus Symbol) -->
+    <path
+        android:fillColor="#2E7D32"
+        android:pathData="M54,34c-11.05,0-20,8.95-20,20s8.95,20,20,20s20-8.95,20-20S65.05,34,54,34z M54,66c-6.63,0-12-5.37-12-12s5.37-12,12-12s12,5.37,12,12S60.63,66,54,66z" />
+    
+    <!-- Stylized Leaf (Nutri Symbol) -->
+    <path
+        android:fillColor="#81C784"
+        android:pathData="M78.5,29.5c-5.5,0-10.5,2.5-14,6.5c-2.5-3.5-6.5-6-11-6.5c-8.5-1-16,5.5-17,14c-0.5,4,1,8,3.5,11c-2-1.5-3.5-3.5-4.5-5.5c-2.5-5.5-1-12,4-16c4.5-3.5,10.5-4,15.5-1.5c1.5-2.5,4-4.5,7-5.5c5.5-2,12-1,16.5,3c1.5,1.5,2.5,3,3,4.5C84.5,31,81.5,29.5,78.5,29.5z" />
+    
+    <!-- Focus Dots -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M30,30h4v4h-4z M74,30h4v4h-4z M30,74h4v4h-4z M74,74h4v4h-4z" />
+        
+</vector>

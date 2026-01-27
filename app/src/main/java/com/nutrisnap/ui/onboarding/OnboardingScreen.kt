@@ -1,3 +1,5 @@
+@file:Suppress("FunctionName")
+
 package com.nutrisnap.ui.onboarding
 
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -15,15 +17,22 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.PhotoCamera
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -36,17 +45,32 @@ data class OnboardingPage(
     val titleRes: Int,
     val descriptionRes: Int,
     val color: Color,
+    val icon: ImageVector,
 )
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-@Suppress("FunctionName")
 fun OnboardingScreen(onFinish: () -> Unit) {
     val pages =
         listOf(
-            OnboardingPage(R.string.onboarding_1_title, R.string.onboarding_1_desc, MaterialTheme.colorScheme.primary),
-            OnboardingPage(R.string.onboarding_2_title, R.string.onboarding_2_desc, MaterialTheme.colorScheme.secondary),
-            OnboardingPage(R.string.onboarding_3_title, R.string.onboarding_3_desc, MaterialTheme.colorScheme.tertiary),
+            OnboardingPage(
+                R.string.onboarding_1_title,
+                R.string.onboarding_1_desc,
+                MaterialTheme.colorScheme.primary,
+                Icons.Default.AutoAwesome,
+            ),
+            OnboardingPage(
+                R.string.onboarding_2_title,
+                R.string.onboarding_2_desc,
+                MaterialTheme.colorScheme.secondary,
+                Icons.Default.PhotoCamera,
+            ),
+            OnboardingPage(
+                R.string.onboarding_3_title,
+                R.string.onboarding_3_desc,
+                MaterialTheme.colorScheme.tertiary,
+                Icons.Default.Timeline,
+            ),
         )
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val scope = rememberCoroutineScope()
@@ -64,11 +88,22 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 Modifier
                     .fillMaxWidth()
                     .padding(24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Skip Button Slot
+            Box(modifier = Modifier.weight(1f)) {
+                if (pagerState.currentPage < pages.size - 1) {
+                    TextButton(onClick = onFinish) {
+                        Text(stringResource(R.string.skip))
+                    }
+                }
+            }
+
             // Page Indicator
-            Row {
+            Row(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                horizontalArrangement = Arrangement.Center,
+            ) {
                 repeat(pages.size) { index ->
                     val color =
                         if (pagerState.currentPage == index) {
@@ -87,32 +122,33 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 }
             }
 
-            // Buttons
-            Button(
-                onClick = {
-                    if (pagerState.currentPage < pages.size - 1) {
-                        scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
-                    } else {
-                        onFinish()
-                    }
-                },
-                shape = CircleShape,
-            ) {
-                Text(
-                    text =
-                        if (pagerState.currentPage == pages.size - 1) {
-                            stringResource(R.string.get_started)
+            // Buttons Slot
+            Box(modifier = Modifier.weight(1f), contentAlignment = Alignment.CenterEnd) {
+                Button(
+                    onClick = {
+                        if (pagerState.currentPage < pages.size - 1) {
+                            scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
                         } else {
-                            stringResource(R.string.next)
-                        },
-                )
+                            onFinish()
+                        }
+                    },
+                    shape = CircleShape,
+                ) {
+                    Text(
+                        text =
+                            if (pagerState.currentPage == pages.size - 1) {
+                                stringResource(R.string.get_started)
+                            } else {
+                                stringResource(R.string.next)
+                            },
+                    )
+                }
             }
         }
     }
 }
 
 @Composable
-@Suppress("FunctionName")
 fun OnboardingPageContent(page: OnboardingPage) {
     Column(
         modifier =
@@ -131,8 +167,12 @@ fun OnboardingPageContent(page: OnboardingPage) {
                     .background(page.color.copy(alpha = 0.2f)),
             contentAlignment = Alignment.Center,
         ) {
-            // Icon or image could go here
-            Text("IMAGE", color = page.color, fontWeight = FontWeight.Bold)
+            Icon(
+                imageVector = page.icon,
+                contentDescription = null,
+                modifier = Modifier.size(120.dp),
+                tint = page.color,
+            )
         }
 
         Spacer(modifier = Modifier.height(48.dp))

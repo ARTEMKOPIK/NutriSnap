@@ -100,7 +100,7 @@ dependencies {
     implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 
     // Coil (Image loading)
-    implementation("io.coil-kt:coil-compose:2.5.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
 
     // PDF generation
     implementation("com.itextpdf:itext7-core:7.1.15")

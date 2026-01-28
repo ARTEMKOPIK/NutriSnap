@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.PhotoCamera
@@ -162,26 +163,38 @@ fun OnboardingPageContent(page: OnboardingPage) {
         Box(
             modifier =
                 Modifier
-                    .size(250.dp)
-                    .clip(CircleShape)
-                    .background(page.color.copy(alpha = 0.2f)),
+                    .size(280.dp)
+                    .clip(RoundedCornerShape(48.dp))
+                    .background(page.color.copy(alpha = 0.1f)),
             contentAlignment = Alignment.Center,
         ) {
-            Icon(
-                imageVector = page.icon,
-                contentDescription = null,
-                modifier = Modifier.size(120.dp),
-                tint = page.color,
-            )
+            Box(
+                modifier =
+                    Modifier
+                        .size(200.dp)
+                        .clip(CircleShape)
+                        .background(page.color.copy(alpha = 0.2f)),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    imageVector = page.icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(100.dp),
+                    tint = page.color,
+                )
+            }
         }
 
-        Spacer(modifier = Modifier.height(48.dp))
+        Spacer(modifier = Modifier.height(56.dp))
 
         Text(
             text = stringResource(page.titleRes),
-            style = MaterialTheme.typography.headlineMedium,
+            style =
+                MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    lineHeight = 40.sp,
+                ),
             textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onBackground,
         )
 

@@ -9,6 +9,7 @@ import com.nutrisnap.data.local.DailyStats
 import com.nutrisnap.data.local.FoodDao
 import com.nutrisnap.data.local.FoodEntry
 import com.nutrisnap.data.repository.GroqRepository
+import com.nutrisnap.util.PreferenceManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,6 +27,7 @@ import java.util.Calendar
 class MainViewModel(
     private val repository: GroqRepository,
     private val foodDao: FoodDao,
+    private val preferenceManager: PreferenceManager,
 ) : ViewModel() {
     private val _uiState = MutableStateFlow<MainUiState>(MainUiState.Idle)
     val uiState: StateFlow<MainUiState> = _uiState.asStateFlow()
@@ -59,6 +61,14 @@ class MainViewModel(
     val recentEntries =
         foodDao.getAllEntries()
             .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    private val _calorieGoal = MutableStateFlow(preferenceManager.calorieGoal)
+    val calorieGoal: StateFlow<Int> = _calorieGoal.asStateFlow()
+
+    fun updateCalorieGoal(goal: Int) {
+        preferenceManager.calorieGoal = goal
+        _calorieGoal.value = goal
+    }
 
     fun analyzeFood(
         text: String? = null,

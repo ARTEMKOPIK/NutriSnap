@@ -27,4 +27,14 @@
     <string name="undo">Отмена</string>
     <string name="close">Закрыть</string>
     <string name="coming_soon">Функция скоро появится</string>
+    <string name="history_title">История приемов пищи</string>
+    <string name="calorie_goal">Цель: %1$d ккал</string>
+    <string name="export_pdf">Экспорт PDF</string>
+    <string name="empty_history">История пуста. Добавьте ваш первый прием пищи!</string>
+    <string name="good_morning">Доброе утро!</string>
+    <string name="good_afternoon">Добрый день!</string>
+    <string name="good_evening">Добрый вечер!</string>
+    <string name="good_night">Доброй ночи!</string>
+    <string name="delete">Удалить</string>
+    <string name="calories_unit">ккал</string>
 </resources>

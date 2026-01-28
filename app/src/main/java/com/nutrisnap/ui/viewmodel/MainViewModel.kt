@@ -1,5 +1,7 @@
 package com.nutrisnap.ui.viewmodel
 
+import android.content.Context
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.nutrisnap.data.api.FoodAnalysis
@@ -54,6 +56,10 @@ class MainViewModel(
             foodDao.getDailyStats(start)
         }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), DailyStats())
 
+    val recentEntries =
+        foodDao.getAllEntries()
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
     fun analyzeFood(
         text: String? = null,
         imageBytes: ByteArray? = null,
@@ -68,6 +74,20 @@ class MainViewModel(
                 .onFailure { error ->
                     _uiState.value = MainUiState.Error(error.message ?: "Unknown error")
                 }
+        }
+    }
+
+    fun analyzeFoodWithUri(
+        context: Context,
+        uri: Uri,
+    ) {
+        _uiState.value = MainUiState.Loading
+        viewModelScope.launch {
+            val imageBytes =
+                context.contentResolver.openInputStream(uri)?.use {
+                    it.readBytes()
+                }
+            analyzeFood(imageBytes = imageBytes)
         }
     }
 

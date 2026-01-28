@@ -1,8 +1,15 @@
 package com.nutrisnap.ui.main
 
+import android.app.Activity
 import android.content.Intent
+import android.speech.RecognizerIntent
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -27,6 +34,8 @@ import androidx.compose.material.icons.filled.PhotoCamera
 import androidx.compose.material.icons.filled.PhotoLibrary
 import androidx.compose.material.icons.filled.PictureAsPdf
 import androidx.compose.material.icons.filled.Send
+import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -44,6 +53,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -82,11 +92,32 @@ import java.util.Locale
 @Suppress("FunctionName")
 fun MainScreen(viewModel: MainViewModel) {
     var showCamera by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
     var inputText by remember { mutableStateOf("") }
     val snackbarHostState = remember { SnackbarHostState() }
     val context = LocalContext.current
     val haptic = LocalHapticFeedback.current
     val scope = rememberCoroutineScope()
+
+    val galleryLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.PickVisualMedia(),
+        ) { uri ->
+            uri?.let { viewModel.analyzeFoodWithUri(context, it) }
+        }
+
+    val voiceLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.StartActivityForResult(),
+        ) { result ->
+            if (result.resultCode == Activity.RESULT_OK) {
+                val results = result.data?.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS)
+                val spokenText = results?.firstOrNull()
+                if (!spokenText.isNullOrBlank()) {
+                    viewModel.analyzeFood(text = spokenText)
+                }
+            }
+        }
 
     val uiState by viewModel.uiState.collectAsState()
     val recentEntries by viewModel.recentEntries.collectAsState()
@@ -115,6 +146,54 @@ fun MainScreen(viewModel: MainViewModel) {
         }
     }
 
+    if (showSettingsDialog) {
+        val currentGoal by viewModel.calorieGoal.collectAsState()
+        var tempGoal by remember { mutableStateOf(currentGoal.toString()) }
+
+        AlertDialog(
+            onDismissRequest = { showSettingsDialog = false },
+            title = { Text(stringResource(R.string.set_calorie_goal)) },
+            text = {
+                OutlinedTextField(
+                    value = tempGoal,
+                    onValueChange = { if (it.all { char -> char.isDigit() }) tempGoal = it },
+                    label = { Text(stringResource(R.string.calories)) },
+                    keyboardOptions =
+                        KeyboardOptions(
+                            imeAction = ImeAction.Done,
+                            keyboardType = androidx.compose.ui.text.input.KeyboardType.Number,
+                        ),
+                    keyboardActions =
+                        KeyboardActions(
+                            onDone = {
+                                val goal = tempGoal.toIntOrNull()
+                                if (goal != null && goal > 0) {
+                                    viewModel.updateCalorieGoal(goal)
+                                    showSettingsDialog = false
+                                }
+                            },
+                        ),
+                )
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val goal = tempGoal.toIntOrNull()
+                    if (goal != null && goal > 0) {
+                        viewModel.updateCalorieGoal(goal)
+                        showSettingsDialog = false
+                    }
+                }) {
+                    Text(stringResource(R.string.save))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSettingsDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            },
+        )
+    }
+
     if (showCamera) {
         CameraScreen(
             onImageCaptured = { uri ->
@@ -139,6 +218,9 @@ fun MainScreen(viewModel: MainViewModel) {
                     )
                 },
                 actions = {
+                    IconButton(onClick = { showSettingsDialog = true }) {
+                        Icon(Icons.Default.Settings, contentDescription = stringResource(R.string.settings))
+                    }
                     IconButton(onClick = {
                         val pdfExporter = PdfExporter(context)
                         val file = pdfExporter.exportToPdf(recentEntries)
@@ -207,7 +289,6 @@ fun MainScreen(viewModel: MainViewModel) {
                     modifier = Modifier.padding(bottom = 16.dp),
                 )
 
-                val comingSoonMessage = stringResource(R.string.coming_soon)
                 Row(
                     modifier =
                         Modifier
@@ -225,14 +306,31 @@ fun MainScreen(viewModel: MainViewModel) {
                         stringResource(R.string.gallery),
                         enabled = !isLoading,
                     ) {
-                        scope.launch { snackbarHostState.showSnackbar(comingSoonMessage) }
+                        galleryLauncher.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly),
+                        )
                     }
                     ActionButton(
                         Icons.Default.Mic,
                         stringResource(R.string.voice),
                         enabled = !isLoading,
                     ) {
-                        scope.launch { snackbarHostState.showSnackbar(comingSoonMessage) }
+                        val intent =
+                            Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH).apply {
+                                putExtra(
+                                    RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                                    RecognizerIntent.LANGUAGE_MODEL_FREE_FORM,
+                                )
+                                putExtra(RecognizerIntent.EXTRA_LANGUAGE, Locale.getDefault())
+                                putExtra(RecognizerIntent.EXTRA_PROMPT, context.getString(R.string.food_description_hint))
+                            }
+                        try {
+                            voiceLauncher.launch(intent)
+                        } catch (e: Exception) {
+                            scope.launch {
+                                snackbarHostState.showSnackbar(context.getString(R.string.analysis_error, e.message ?: ""))
+                            }
+                        }
                     }
                 }
 
@@ -353,7 +451,7 @@ fun GreetingHeader() {
 @Suppress("FunctionName")
 fun DailySummaryCard(viewModel: MainViewModel) {
     val dailyStats by viewModel.dailyStats.collectAsState()
-    val calorieGoal = 2000 // In a real app, this would be a user setting
+    val calorieGoal by viewModel.calorieGoal.collectAsState()
 
     val animatedCalories by animateIntAsState(targetValue = dailyStats.calories, label = "calories")
     val progress = (dailyStats.calories.toFloat() / calorieGoal).coerceIn(0f, 1.2f)
@@ -455,20 +553,60 @@ fun HistoryItem(
     entry: FoodEntry,
     onDelete: () -> Unit,
 ) {
+    var expanded by remember { mutableStateOf(false) }
     val sdf = remember { SimpleDateFormat("HH:mm", Locale.getDefault()) }
     val timeStr = sdf.format(Date(entry.timestamp))
 
-    ListItem(
-        headlineContent = { Text(entry.dishName, fontWeight = FontWeight.SemiBold) },
-        supportingContent = {
-            Text("${entry.calories} ${stringResource(R.string.calories_unit)} • $timeStr")
-        },
-        trailingContent = {
-            IconButton(onClick = onDelete) {
-                Icon(Icons.Default.Delete, contentDescription = stringResource(R.string.delete), tint = MaterialTheme.colorScheme.error)
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .animateContentSize()
+                .clickable { expanded = !expanded },
+    ) {
+        ListItem(
+            headlineContent = { Text(entry.dishName, fontWeight = FontWeight.SemiBold) },
+            supportingContent = {
+                Text("${entry.calories} ${stringResource(R.string.calories_unit)} • $timeStr")
+            },
+            trailingContent = {
+                IconButton(onClick = onDelete) {
+                    Icon(
+                        Icons.Default.Delete,
+                        contentDescription = stringResource(R.string.delete),
+                        tint = MaterialTheme.colorScheme.error,
+                    )
+                }
+            },
+        )
+        if (expanded) {
+            Column(
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 8.dp),
+            ) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    MacroInfo(stringResource(R.string.proteins), "${entry.proteins}г")
+                    MacroInfo(stringResource(R.string.fats), "${entry.fats}г")
+                    MacroInfo(stringResource(R.string.carbs), "${entry.carbs}г")
+                }
+                if (entry.aiTip.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = entry.aiTip,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary,
+                        fontWeight = FontWeight.Medium,
+                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                    )
+                }
             }
-        },
-    )
+        }
+    }
 }
 
 @Composable

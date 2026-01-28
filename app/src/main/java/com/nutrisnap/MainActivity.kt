@@ -17,17 +17,19 @@ import com.nutrisnap.ui.main.MainScreen
 import com.nutrisnap.ui.onboarding.OnboardingScreen
 import com.nutrisnap.ui.theme.NutriSnapTheme
 import com.nutrisnap.ui.viewmodel.MainViewModel
+import com.nutrisnap.util.PreferenceManager
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         val app = application as NutriSnapApp
+        val preferenceManager = PreferenceManager(this)
         val viewModelFactory =
             object : ViewModelProvider.Factory {
                 @Suppress("UNCHECKED_CAST")
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                    return MainViewModel(app.repository, app.database.foodDao()) as T
+                    return MainViewModel(app.repository, app.database.foodDao(), preferenceManager) as T
                 }
             }
 

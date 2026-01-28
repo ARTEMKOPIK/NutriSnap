@@ -37,4 +37,9 @@
     <string name="good_night">Доброй ночи!</string>
     <string name="delete">Удалить</string>
     <string name="calories_unit">ккал</string>
+    <string name="settings">Настройки</string>
+    <string name="set_calorie_goal">Установить цель калорий</string>
+    <string name="cancel">Отмена</string>
+    <string name="save">Сохранить</string>
+    <string name="invalid_input">Некорректный ввод</string>
 </resources>
